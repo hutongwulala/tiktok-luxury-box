@@ -207,15 +207,14 @@ REALITY_PRIV=$(openssl ecparam -name prime256v1 -genkey -noout 2>/dev/null | bas
 [[ -z "$REALITY_PUB" ]] && REALITY_PUB="REPLACE_WITH_YOUR_PUBKEY"
 [[ -z "$REALITY_PRIV" ]] && REALITY_PRIV="REPLACE_WITH_YOUR_PRIVKEY"
 
-# 生成配置（先备份旧的）
+# 备份旧的配置
 if [[ -f /etc/sing-box/config.json ]]; then
     cp /etc/sing-box/config.json /etc/sing-box/config.json.bak.$(date +%Y%m%d%H%M%S)
     echo -e "${YELLOW}[BACKUP]${NC} 旧配置已备份"
 fi
 
-mkdir -p /etc/sing-box
-
-cat > /etc/sing-box/config.json << 'EOF'
+# 直接生成配置（变量会被展开）
+cat > /etc/sing-box/config.json << EOF
 {
   "log": {
     "level": "info",
@@ -227,8 +226,8 @@ cat > /etc/sing-box/config.json << 'EOF'
       "tag": "mixed-in",
       "listen": "0.0.0.0",
       "listen_ports": {
-        "min": MIXED_PORT,
-        "max": MIXED_PORT
+        "min": $PORT_MIXED,
+        "max": $PORT_MIXED
       },
       "sniff": true,
       "sniff_override_destination": true
@@ -238,14 +237,14 @@ cat > /etc/sing-box/config.json << 'EOF'
       "tag": "vless-reality-in",
       "listen": "0.0.0.0",
       "listen_ports": {
-        "min": VLESS_PORT,
-        "max": VLESS_PORT
+        "min": $PORT_VLESS,
+        "max": $PORT_VLESS
       },
       "protocol": "vless",
       "settings": {
         "clients": [
           {
-            "id": "UUID_PLACEHOLDER",
+            "id": "$UUID",
             "flow": "xtls-rprx-vision"
           }
         ],
@@ -261,14 +260,9 @@ cat > /etc/sing-box/config.json << 'EOF'
             "server_port": 443
           },
           "dest": "www.apple.com:443",
-          "private_key": "REALITY_PRIV_PLACEHOLDER",
-          "short_id": [
-            ""
-          ]
+          "private_key": "$REALITY_PRIV",
+          "short_id": [""]
         }
-      },
-      "transport": {
-        "type": "tcp"
       }
     },
     {
@@ -276,14 +270,14 @@ cat > /etc/sing-box/config.json << 'EOF'
       "tag": "vmess-ws-in",
       "listen": "0.0.0.0",
       "listen_ports": {
-        "min": VMESS_PORT,
-        "max": VMESS_PORT
+        "min": $PORT_VMESS,
+        "max": $PORT_VMESS
       },
       "protocol": "vmess",
       "settings": {
         "clients": [
           {
-            "id": "UUID_PLACEHOLDER",
+            "id": "$UUID",
             "alterId": 0
           }
         ]
@@ -304,14 +298,14 @@ cat > /etc/sing-box/config.json << 'EOF'
       "tag": "hysteria2-in",
       "listen": "0.0.0.0",
       "listen_ports": {
-        "min": HYSTERIA_PORT,
-        "max": HYSTERIA_PORT
+        "min": $PORT_HYSTERIA,
+        "max": $PORT_HYSTERIA
       },
       "protocol": "hysteria2",
       "settings": {
         "auth": {
           "type": "password",
-          "password": "HYSTERIA_PWD_PLACEHOLDER"
+          "password": "$HYSTERIA_PWD"
         },
         "bandwidth": {
           "up": 100,
@@ -328,15 +322,15 @@ cat > /etc/sing-box/config.json << 'EOF'
       "tag": "tuic-in",
       "listen": "0.0.0.0",
       "listen_ports": {
-        "min": TUIC_PORT,
-        "max": TUIC_PORT
+        "min": $PORT_TUIC,
+        "max": $PORT_TUIC
       },
       "protocol": "tuic",
       "settings": {
         "users": [
           {
-            "uuid": "TUIC_UUID_PLACEHOLDER",
-            "password": "TUIC_PWD_PLACEHOLDER"
+            "uuid": "$TUIC_UUID",
+            "password": "$TUIC_PASSWORD"
           }
         ],
         "congestion_control": "bbr",
@@ -352,8 +346,8 @@ cat > /etc/sing-box/config.json << 'EOF'
       "tag": "naive-in",
       "listen": "0.0.0.0",
       "listen_ports": {
-        "min": ANYTLS_PORT,
-        "max": ANYTLS_PORT
+        "min": $PORT_ANYTLS,
+        "max": $PORT_ANYTLS
       },
       "protocol": "naive",
       "settings": {
@@ -391,16 +385,16 @@ cat > /etc/sing-box/config.json << 'EOF'
     {
       "type": "vless",
       "tag": "vless-reality-out",
-      "server": "SERVER_IP_PLACEHOLDER",
-      "port": VLESS_PORT,
-      "uuid": "UUID_PLACEHOLDER",
+      "server": "$SERVER_IP",
+      "port": $PORT_VLESS,
+      "uuid": "$UUID",
       "flow": "xtls-rprx-vision",
       "tls": {
         "enabled": true,
         "server_name": "www.apple.com",
         "reality": {
           "enabled": true,
-          "public_key": "REALITY_PUB_PLACEHOLDER",
+          "public_key": "$REALITY_PUB",
           "short_id": ""
         }
       }
@@ -408,9 +402,9 @@ cat > /etc/sing-box/config.json << 'EOF'
     {
       "type": "vmess",
       "tag": "vmess-ws-out",
-      "server": "SERVER_IP_PLACEHOLDER",
-      "port": VMESS_PORT,
-      "uuid": "UUID_PLACEHOLDER",
+      "server": "$SERVER_IP",
+      "port": $PORT_VMESS,
+      "uuid": "$UUID",
       "alterId": 0,
       "security": "auto",
       "transport": {
@@ -427,11 +421,11 @@ cat > /etc/sing-box/config.json << 'EOF'
     {
       "type": "hysteria2",
       "tag": "hysteria2-out",
-      "server": "SERVER_IP_PLACEHOLDER",
-      "port": HYSTERIA_PORT,
+      "server": "$SERVER_IP",
+      "port": $PORT_HYSTERIA,
       "up_mbps": 100,
       "down_mbps": 100,
-      "password": "HYSTERIA_PWD_PLACEHOLDER",
+      "password": "$HYSTERIA_PWD",
       "tls": {
         "enabled": true,
         "server_name": "www.google.com",
@@ -441,10 +435,10 @@ cat > /etc/sing-box/config.json << 'EOF'
     {
       "type": "tuic",
       "tag": "tuic-out",
-      "server": "SERVER_IP_PLACEHOLDER",
-      "port": TUIC_PORT,
-      "uuid": "TUIC_UUID_PLACEHOLDER",
-      "password": "TUIC_PWD_PLACEHOLDER",
+      "server": "$SERVER_IP",
+      "port": $PORT_TUIC,
+      "uuid": "$TUIC_UUID",
+      "password": "$TUIC_PASSWORD",
       "congestion_control": "bbr",
       "tls": {
         "enabled": true,
@@ -489,21 +483,6 @@ cat > /etc/sing-box/config.json << 'EOF'
   }
 }
 EOF
-
-# 替换占位符（使用 # 作为分隔符避免UUID中的-被解释为选项）
-sed -i "s#UUID_PLACEHOLDER#$UUID#g" /etc/sing-box/config.json
-sed -i "s#SERVER_IP_PLACEHOLDER#$SERVER_IP#g" /etc/sing-box/config.json
-sed -i "s#REALITY_PRIV_PLACEHOLDER#$REALITY_PRIV#g" /etc/sing-box/config.json
-sed -i "s#REALITY_PUB_PLACEHOLDER#$REALITY_PUB#g" /etc/sing-box/config.json
-sed -i "s#HYSTERIA_PWD_PLACEHOLDER#$HYSTERIA_PWD#g" /etc/sing-box/config.json
-sed -i "s#TUIC_UUID_PLACEHOLDER#$TUIC_UUID#g" /etc/sing-box/config.json
-sed -i "s#TUIC_PWD_PLACEHOLDER#$TUIC_PASSWORD#g" /etc/sing-box/config.json
-sed -i "s#MIXED_PORT#$PORT_MIXED#g" /etc/sing-box/config.json
-sed -i "s#VLESS_PORT#$PORT_VLESS#g" /etc/sing-box/config.json
-sed -i "s#VMESS_PORT#$PORT_VMESS#g" /etc/sing-box/config.json
-sed -i "s#HYSTERIA_PORT#$PORT_HYSTERIA#g" /etc/sing-box/config.json
-sed -i "s#TUIC_PORT#$PORT_TUIC#g" /etc/sing-box/config.json
-sed -i "s#ANYTLS_PORT#$PORT_ANYTLS#g" /etc/sing-box/config.json
 
 echo -e "${GREEN}[OK]${NC} 配置文件已生成"
 
