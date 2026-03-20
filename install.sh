@@ -490,20 +490,20 @@ cat > /etc/sing-box/config.json << 'EOF'
 }
 EOF
 
-# 替换占位符
-sed -i "s/UUID_PLACEHOLDER/$UUID/g" /etc/sing-box/config.json
-sed -i "s/SERVER_IP_PLACEHOLDER/$SERVER_IP/g" /etc/sing-box/config.json
-sed -i "s/REALITY_PRIV_PLACEHOLDER/$REALITY_PRIV/g" /etc/sing-box/config.json
-sed -i "s/REALITY_PUB_PLACEHOLDER/$REALITY_PUB/g" /etc/sing-box/config.json
-sed -i "s/HYSTERIA_PWD_PLACEHOLDER/$HYSTERIA_PWD/g" /etc/sing-box/config.json
-sed -i "s/TUIC_UUID_PLACEHOLDER/$TUIC_UUID/g" /etc/sing-box/config.json
-sed -i "s/TUIC_PWD_PLACEHOLDER/$TUIC_PASSWORD/g" /etc/sing-box/config.json
-sed -i "s/MIXED_PORT/$PORT_MIXED/g" /etc/sing-box/config.json
-sed -i "s/VLESS_PORT/$PORT_VLESS/g" /etc/sing-box/config.json
-sed -i "s/VMESS_PORT/$PORT_VMESS/g" /etc/sing-box/config.json
-sed -i "s/HYSTERIA_PORT/$PORT_HYSTERIA/g" /etc/sing-box/config.json
-sed -i "s/TUIC_PORT/$PORT_TUIC/g" /etc/sing-box/config.json
-sed -i "s/ANYTLS_PORT/$PORT_ANYTLS/g" /etc/sing-box/config.json
+# 替换占位符（使用 # 作为分隔符避免UUID中的-被解释为选项）
+sed -i "s#UUID_PLACEHOLDER#$UUID#g" /etc/sing-box/config.json
+sed -i "s#SERVER_IP_PLACEHOLDER#$SERVER_IP#g" /etc/sing-box/config.json
+sed -i "s#REALITY_PRIV_PLACEHOLDER#$REALITY_PRIV#g" /etc/sing-box/config.json
+sed -i "s#REALITY_PUB_PLACEHOLDER#$REALITY_PUB#g" /etc/sing-box/config.json
+sed -i "s#HYSTERIA_PWD_PLACEHOLDER#$HYSTERIA_PWD#g" /etc/sing-box/config.json
+sed -i "s#TUIC_UUID_PLACEHOLDER#$TUIC_UUID#g" /etc/sing-box/config.json
+sed -i "s#TUIC_PWD_PLACEHOLDER#$TUIC_PASSWORD#g" /etc/sing-box/config.json
+sed -i "s#MIXED_PORT#$PORT_MIXED#g" /etc/sing-box/config.json
+sed -i "s#VLESS_PORT#$PORT_VLESS#g" /etc/sing-box/config.json
+sed -i "s#VMESS_PORT#$PORT_VMESS#g" /etc/sing-box/config.json
+sed -i "s#HYSTERIA_PORT#$PORT_HYSTERIA#g" /etc/sing-box/config.json
+sed -i "s#TUIC_PORT#$PORT_TUIC#g" /etc/sing-box/config.json
+sed -i "s#ANYTLS_PORT#$PORT_ANYTLS#g" /etc/sing-box/config.json
 
 echo -e "${GREEN}[OK]${NC} 配置文件已生成"
 
