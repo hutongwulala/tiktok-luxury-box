@@ -7,7 +7,7 @@
 ## 一键安装
 
 ```bash
-bash <(curl -Ls https://raw.githubusercontent.com/你的GitHub用户名/tiktok-luxury-box/main/install.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/hutongwulala/tiktok-luxury-box/main/install.sh)
 ```
 
 ---
@@ -84,7 +84,7 @@ ssh root@你的VPS_IP
 复制以下命令，粘贴到终端：
 
 ```bash
-bash <(curl -Ls https://raw.githubusercontent.com/你的GitHub用户名/tiktok-luxury-box/main/install.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/hutongwulala/tiktok-luxury-box/main/install.sh)
 ```
 
 ### 3. 配置通知（可选）
