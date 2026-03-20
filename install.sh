@@ -137,21 +137,31 @@ case $ARCH in
     *) ARCH_NAME="amd64" ;;
 esac
 
-# 尝试多个源
+# 尝试多个源（国内可访问的镜像）
 DOWNLOAD_SUCCESS=false
 for version in "v1.9.12" "v1.9.11" "v1.9.10" "v1.9.9"; do
     echo -e "${BLUE}[INFO]${NC} 尝试下载 sing-box $version..."
-    URL1="https://github.com/SagerNet/sing-box/releases/download/${version}/sing-box-${version#v}-linux-${ARCH_NAME}.tar.gz"
-    URL2="https://cdn.jsdelivr.net/gh/SagerNet/sing-box@${version}/download/sing-box-${version#v}-linux-${ARCH_NAME}.tar.gz"
     
-    if curl -kL -o sing-box.tar.gz "$URL1" 2>/dev/null && [[ -s sing-box.tar.gz ]]; then
-        DOWNLOAD_SUCCESS=true
-        break
-    fi
-    if curl -kL -o sing-box.tar.gz "$URL2" 2>/dev/null && [[ -s sing-box.tar.gz ]]; then
-        DOWNLOAD_SUCCESS=true
-        break
-    fi
+    # GitHub 直链
+    URL1="https://github.com/SagerNet/sing-box/releases/download/${version}/sing-box-${version#v}-linux-${ARCH_NAME}.tar.gz"
+    # ghproxy 镜像
+    URL2="https://ghproxy.com/${URL1}"
+    # ghproxy 备用
+    URL3="https://mirror.ghproxy.com/${URL1}"
+    # gitee 镜像
+    URL4="https://gitee.com/sing-box/sing-box/releases/download/${version}/sing-box-${version#v}-linux-${ARCH_NAME}.tar.gz"
+    
+    for url in "$URL1" "$URL2" "$URL3" "$URL4"; do
+        echo -e "${BLUE}[尝试]${NC} $url"
+        if curl -kL --connect-timeout 15 --max-time 120 -o sing-box.tar.gz "$url" 2>/dev/null && [[ -s sing-box.tar.gz ]]; then
+            # 验证文件是否为有效压缩包
+            if file sing-box.tar.gz | grep -q "gzip\|compress"; then
+                DOWNLOAD_SUCCESS=true
+                echo -e "${GREEN}[成功]${NC} 从 $url 下载成功"
+                break 2
+            fi
+        fi
+    done
 done
 
 if ! $DOWNLOAD_SUCCESS; then
