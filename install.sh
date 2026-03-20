@@ -127,7 +127,7 @@ echo "║   步骤3: 安装 sing-box 多协议                  ║"
 echo "╚═══════════════════════════════════════════════════╝"
 echo -e "${NC}"
 
-# 下载 sing-box
+# 安装 sing-box
 cd /tmp
 ARCH=$(uname -m)
 case $ARCH in
@@ -137,46 +137,51 @@ case $ARCH in
     *) ARCH_NAME="amd64" ;;
 esac
 
-# 尝试多个源（国内可访问的镜像）
-DOWNLOAD_SUCCESS=false
-for version in "v1.9.12" "v1.9.11" "v1.9.10" "v1.9.9"; do
-    echo -e "${BLUE}[INFO]${NC} 尝试下载 sing-box $version..."
+# 检查是否已安装
+if command -v sing-box &> /dev/null; then
+    echo -e "${GREEN}[OK]${NC} sing-box 已安装: $(sing-box version | head -1)"
+else
+    echo -e "${BLUE}[INFO]${NC} 正在安装 sing-box..."
     
-    # GitHub 直链
-    URL1="https://github.com/SagerNet/sing-box/releases/download/${version}/sing-box-${version#v}-linux-${ARCH_NAME}.tar.gz"
-    # ghproxy 镜像
-    URL2="https://ghproxy.com/${URL1}"
-    # ghproxy 备用
-    URL3="https://mirror.ghproxy.com/${URL1}"
-    # gitee 镜像
-    URL4="https://gitee.com/sing-box/sing-box/releases/download/${version}/sing-box-${version#v}-linux-${ARCH_NAME}.tar.gz"
+    # 获取最新版本号
+    LATEST_VERSION=$(curl -kLs https://api.github.com/repos/SagerNet/sing-box/releases/latest 2>/dev/null | grep tag_name | cut -d'"' -f4)
+    [[ -z "$LATEST_VERSION" ]] && LATEST_VERSION="v1.13.3"
+    echo -e "${BLUE}[INFO]${NC} 最新版本: $LATEST_VERSION"
     
-    for url in "$URL1" "$URL2" "$URL3" "$URL4"; do
+    # 下载链接列表（按优先级排序）
+    BASE_NAME="sing-box-${LATEST_VERSION#v}-linux-${ARCH_NAME}.tar.gz"
+    URLS="
+    https://github.com/SagerNet/sing-box/releases/download/${LATEST_VERSION}/${BASE_NAME}
+    https://ghproxy.com/https://github.com/SagerNet/sing-box/releases/download/${LATEST_VERSION}/${BASE_NAME}
+    https://mirror.ghproxy.com/https://github.com/SagerNet/sing-box/releases/download/${LATEST_VERSION}/${BASE_NAME}
+    https://gitee.com/sing-box/sing-box/releases/download/${LATEST_VERSION}/${BASE_NAME}
+    "
+    
+    DOWNLOAD_SUCCESS=false
+    for url in $URLS; do
         echo -e "${BLUE}[尝试]${NC} $url"
-        if curl -kL --connect-timeout 15 --max-time 120 -o sing-box.tar.gz "$url" 2>/dev/null && [[ -s sing-box.tar.gz ]]; then
-            # 验证文件是否为有效压缩包
-            if file sing-box.tar.gz | grep -q "gzip\|compress"; then
+        rm -f sing-box.tar.gz
+        if wget -q --timeout=60 -O sing-box.tar.gz "$url" 2>/dev/null && [[ -s sing-box.tar.gz ]]; then
+            if file sing-box.tar.gz | grep -qE "gzip|archive"; then
                 DOWNLOAD_SUCCESS=true
-                echo -e "${GREEN}[成功]${NC} 从 $url 下载成功"
-                break 2
+                echo -e "${GREEN}[成功]${NC} 下载成功"
+                break
             fi
         fi
     done
-done
-
-if ! $DOWNLOAD_SUCCESS; then
-    echo -e "${RED}[ERROR]${NC} 下载失败，请检查网络"
-    exit 1
+    
+    if ! $DOWNLOAD_SUCCESS; then
+        echo -e "${RED}[ERROR]${NC} 下载失败"
+        echo -e "${YELLOW}[提示]${NC} 请手动下载 sing-box 后重新运行脚本"
+        exit 1
+    fi
+    
+    tar -xzf sing-box.tar.gz
+    mv sing-box-*/sing-box /usr/local/bin/sing-box
+    chmod +x /usr/local/bin/sing-box
+    rm -rf sing-box*
+    echo -e "${GREEN}[OK]${NC} sing-box 安装完成: $(sing-box version | head -1)"
 fi
-
-tar -xzf sing-box.tar.gz
-mv sing-box-*/sing-box /usr/local/bin/sing-box
-chmod +x /usr/local/bin/sing-box
-rm -rf sing-box*
-
-# 验证安装
-sing-box version | head -1
-echo -e "${GREEN}[OK]${NC} sing-box 安装完成"
 
 # ============================================
 # 步骤4: 生成配置
