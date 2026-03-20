@@ -144,11 +144,11 @@ for version in "v1.9.12" "v1.9.11" "v1.9.10" "v1.9.9"; do
     URL1="https://github.com/SagerNet/sing-box/releases/download/${version}/sing-box-${version#v}-linux-${ARCH_NAME}.tar.gz"
     URL2="https://cdn.jsdelivr.net/gh/SagerNet/sing-box@${version}/download/sing-box-${version#v}-linux-${ARCH_NAME}.tar.gz"
     
-    if curl -L -o sing-box.tar.gz "$URL1" 2>/dev/null && [[ -s sing-box.tar.gz ]]; then
+    if curl -kL -o sing-box.tar.gz "$URL1" 2>/dev/null && [[ -s sing-box.tar.gz ]]; then
         DOWNLOAD_SUCCESS=true
         break
     fi
-    if curl -L -o sing-box.tar.gz "$URL2" 2>/dev/null && [[ -s sing-box.tar.gz ]]; then
+    if curl -kL -o sing-box.tar.gz "$URL2" 2>/dev/null && [[ -s sing-box.tar.gz ]]; then
         DOWNLOAD_SUCCESS=true
         break
     fi
