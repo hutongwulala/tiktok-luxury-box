@@ -99,7 +99,7 @@ cat > /etc/sing-box/config.json << CONFIGEOF
     {"type": "vless", "tag": "vless-in", "listen": "0.0.0.0", "listen_port": ${P_VLESS}, "users": [{"uuid": "${UUID}", "flow": "xtls-rprx-vision"}], "tls": {"enabled": true, "server_name": "www.microsoft.com", "reality": {"enabled": true, "handshake": {"server": "www.microsoft.com", "server_port": 443}, "dest": "www.microsoft.com:443", "private_key": "${REALITY_PRIV}", "short_id": ["a1b2c3d4"]}}},
     {"type": "vmess", "tag": "vmess-in", "listen": "0.0.0.0", "listen_port": ${P_VMESS}, "users": [{"id": "${UUID}", "alterId": 0}], "transport": {"type": "ws", "ws": {"path": "/vmess-ws"}}, "tls": {"enabled": true, "server_name": "cloudflare.com"}},
     {"type": "hysteria2", "tag": "hy2-in", "listen": "0.0.0.0", "listen_port": ${P_HY2}, "settings": {"auth": {"type": "password", "password": "${HY2_PWD}"}}, "tls": {"enabled": true, "server_name": "www.google.com"}},
-    {"type": "tuic", "tag": "tuic-in", "listen": "0.0.0.0", "listen_port": ${P_TUIC}, "settings": {"users": [{"uuid": "${TUIC_UUID}", "password": "${TUIC_PWD}"], "congestion_control": "bbr"}, "tls": {"enabled": true, "server_name": "www.microsoft.com"}}
+     {"type": "tuic", "tag": "tuic-in", "listen": "0.0.0.0", "listen_port": ${P_TUIC}, "settings": {"users": [{"uuid": "${TUIC_UUID}", "password": "${TUIC_PWD}"}], "congestion_control": "bbr"}, "tls": {"enabled": true, "server_name": "www.microsoft.com"}}}
   ],
   "outbounds": [
     {"type": "urltest", "tag": "auto", "outbounds": ["direct"], "default": "direct", "url": "https://www.tiktok.com", "interval": "10m"},
