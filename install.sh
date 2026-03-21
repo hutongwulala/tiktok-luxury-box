@@ -126,6 +126,13 @@ SVCEOF
     sleep 2
     
     if systemctl is-active --quiet sing-box; then
+        # 创建快捷命令 sb
+        cat > /usr/local/bin/sb << 'SBEOF'
+#!/bin/bash
+bash <(curl -sL https://raw.githubusercontent.com/hutongwulala/tiktok-luxury-box/main/install.sh)
+SBEOF
+        chmod +x /usr/local/bin/sb
+        echo -e "${GREEN}[OK]${NC} 快捷命令已创建: ${YELLOW}sb${NC}"
         return 0
     else
         echo -e "${RED}[错误]${NC} 服务启动失败"
