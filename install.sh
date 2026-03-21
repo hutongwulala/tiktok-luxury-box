@@ -1,8 +1,7 @@
 #!/bin/bash
 # ============================================
-# TikTok精装桶Pro - v1.0.8
-# 多协议 + BBR加速 + 自动故障切换
-# 配置格式已验证 (sing-box 1.13+)
+# TikTok精装桶Pro - v1.0.10
+# 使用jq生成配置，确保JSON格式正确
 # ============================================
 
 set -e
@@ -34,7 +33,7 @@ P_HY2=$(random_port)
 P_TUIC=$(random_port)
 
 echo -e "${CYAN}=============================================="
-echo "  TikTok精装桶Pro v1.0.8"
+echo "  TikTok精装桶Pro v1.0.10"
 echo "==============================================${NC}"
 
 SERVER_IP=$(curl -s ifconfig.me 2>/dev/null || curl -s ip.sb 2>/dev/null || echo "YOUR_IP")
@@ -76,39 +75,161 @@ if ! command -v sing-box &> /dev/null; then
     fi
 fi
 
-# 3: 配置 (已验证的格式)
+# 3: 配置 - 使用jq生成JSON
 echo -e "${YELLOW}[3/4]${NC} 生成配置..."
 
 UUID=$(cat /proc/sys/kernel/random/uuid)
-REALITY_KEY=$(sing-box generate reality-keypair 2>/dev/null || echo "PRIVATE_KEY:xxx\nPUBLIC_KEY:xxx")
-REALITY_PRIV=$(echo "$REALITY_KEY" | grep "PrivateKey:" | cut -d: -f2 | tr -d ' ')
-REALITY_PUB=$(echo "$REALITY_KEY" | grep "PublicKey:" | cut -d: -f2 | tr -d ' ')
-[[ -z "$REALITY_PRIV" ]] && REALITY_PRIV="xxx" && REALITY_PUB="xxx"
-HY2_PWD=$(openssl rand -base64 16)
+REALITY_PRIV=$(openssl ecparam -name prime256v1 -genkey -noout 2>/dev/null | base64 -w 0)
+REALITY_PUB=$(openssl ecparam -name prime256v1 -genkey -noout 2>/dev/null | openssl ec -pubout 2>/dev/null | base64 -w 0)
+HY2_PWD=$(openssl rand -base64 16 | tr -d '=+/' | head -c 32)
 TUIC_UUID=$(cat /proc/sys/kernel/random/uuid)
-TUIC_PWD=$(openssl rand -base64 16)
+TUIC_PWD=$(openssl rand -base64 16 | tr -d '=+/' | head -c 32)
 
 mkdir -p /etc/sing-box /var/log/sing-box
 [[ -f /etc/sing-box/config.json ]] && cp /etc/sing-box/config.json /etc/sing-box/config.json.bak.$(date +%Y%m%d%H%M%S)
 
-cat > /etc/sing-box/config.json << CONFIGEOF
-{
-  "log": {"level": "info", "output": "/var/log/sing-box/sing-box.log"},
+# 用jq生成干净的JSON配置
+jq -n \
+  --arg loglevel "info" \
+  --arg logfile "/var/log/sing-box/sing-box.log" \
+  --arg ip "$SERVER_IP" \
+  --arg mixed "$P_MIXED" \
+  --arg vless "$P_VLESS" \
+  --arg vmess "$P_VMESS" \
+  --arg hy2 "$P_HY2" \
+  --arg tuic "$P_TUIC" \
+  --arg uuid "$UUID" \
+  --arg rpriv "$REALITY_PRIV" \
+  --arg rpub "$REALITY_PUB" \
+  --arg hy2pwd "$HY2_PWD" \
+  --arg tuicuuid "$TUIC_UUID" \
+  --arg tuicpwd "$TUIC_PWD" \
+  '{
+  "log": {
+    "level": $loglevel,
+    "output": $logfile
+  },
   "inbounds": [
-    {"type": "mixed", "tag": "mixed-in", "listen": "0.0.0.0", "listen_port": ${P_MIXED}, "sniff": true, "sniff_override_destination": true},
-    {"type": "vless", "tag": "vless-in", "listen": "0.0.0.0", "listen_port": ${P_VLESS}, "users": [{"uuid": "${UUID}", "flow": "xtls-rprx-vision"}], "tls": {"enabled": true, "server_name": "www.microsoft.com", "reality": {"enabled": true, "handshake": {"server": "www.microsoft.com", "server_port": 443}, "dest": "www.microsoft.com:443", "private_key": "${REALITY_PRIV}", "short_id": ["a1b2c3d4"]}}},
-    {"type": "vmess", "tag": "vmess-in", "listen": "0.0.0.0", "listen_port": ${P_VMESS}, "users": [{"id": "${UUID}", "alterId": 0}], "transport": {"type": "ws", "ws": {"path": "/vmess-ws"}}, "tls": {"enabled": true, "server_name": "cloudflare.com"}},
-    {"type": "hysteria2", "tag": "hy2-in", "listen": "0.0.0.0", "listen_port": ${P_HY2}, "settings": {"auth": {"type": "password", "password": "${HY2_PWD}"}}, "tls": {"enabled": true, "server_name": "www.google.com"}},
-     {"type": "tuic", "tag": "tuic-in", "listen": "0.0.0.0", "listen_port": ${P_TUIC}, "settings": {"users": [{"uuid": "${TUIC_UUID}", "password": "${TUIC_PWD}"}], "congestion_control": "bbr"}, "tls": {"enabled": true, "server_name": "www.microsoft.com"}}}
+    {
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "0.0.0.0",
+      "listen_port": ($mixed | tonumber),
+      "sniff": true,
+      "sniff_override_destination": true
+    },
+    {
+      "type": "vless",
+      "tag": "vless-in",
+      "listen": "0.0.0.0",
+      "listen_port": ($vless | tonumber),
+      "users": [
+        {
+          "uuid": $uuid,
+          "flow": "xtls-rprx-vision"
+        }
+      ],
+      "tls": {
+        "enabled": true,
+        "server_name": "www.microsoft.com",
+        "reality": {
+          "enabled": true,
+          "handshake": {
+            "server": "www.microsoft.com",
+            "server_port": 443
+          },
+          "dest": "www.microsoft.com:443",
+          "private_key": $rpriv,
+          "short_id": ["a1b2c3d4"]
+        }
+      }
+    },
+    {
+      "type": "vmess",
+      "tag": "vmess-in",
+      "listen": "0.0.0.0",
+      "listen_port": ($vmess | tonumber),
+      "users": [
+        {
+          "id": $uuid,
+          "alterId": 0
+        }
+      ],
+      "transport": {
+        "type": "ws",
+        "ws": {
+          "path": "/vmess-ws"
+        }
+      },
+      "tls": {
+        "enabled": true,
+        "server_name": "cloudflare.com"
+      }
+    },
+    {
+      "type": "hysteria2",
+      "tag": "hy2-in",
+      "listen": "0.0.0.0",
+      "listen_port": ($hy2 | tonumber),
+      "settings": {
+        "auth": {
+          "type": "password",
+          "password": $hy2pwd
+        }
+      },
+      "tls": {
+        "enabled": true,
+        "server_name": "www.google.com"
+      }
+    },
+    {
+      "type": "tuic",
+      "tag": "tuic-in",
+      "listen": "0.0.0.0",
+      "listen_port": ($tuic | tonumber),
+      "settings": {
+        "users": [
+          {
+            "uuid": $tuicuuid,
+            "password": $tuicpwd
+          }
+        ],
+        "congestion_control": "bbr"
+      },
+      "tls": {
+        "enabled": true,
+        "server_name": "www.microsoft.com"
+      }
+    }
   ],
   "outbounds": [
-    {"type": "urltest", "tag": "auto", "outbounds": ["direct"], "default": "direct", "url": "https://www.tiktok.com", "interval": "10m"},
-    {"type": "direct", "tag": "direct"},
-    {"type": "block", "tag": "block"}
+    {
+      "type": "urltest",
+      "tag": "auto",
+      "outbounds": ["direct"],
+      "default": "direct",
+      "url": "https://www.tiktok.com",
+      "interval": "10m"
+    },
+    {
+      "type": "direct",
+      "tag": "direct"
+    },
+    {
+      "type": "block",
+      "tag": "block"
+    }
   ],
-  "route": {"rules": [{"type": "default", "outbound": "auto"}]}
-}
-CONFIGEOF
+  "route": {
+    "auto_detect_interface": true,
+    "rules": [
+      {
+        "type": "default",
+        "outbound": "auto"
+      }
+    ]
+  }
+}' > /etc/sing-box/config.json
 
 # 4: 服务
 echo -e "${YELLOW}[4/4]${NC} 启动服务..."
@@ -156,11 +277,11 @@ echo ""
 echo -e "${YELLOW}服务器IP:${NC} $SERVER_IP"
 echo ""
 echo -e "${CYAN}端口:${NC}"
-echo "  Mixed:     ${P_MIXED}"
-echo "  VLESS:     ${P_VLESS}"
-echo "  VMess:     ${P_VMESS}"
-echo "  Hysteria2: ${P_HY2}"
-echo "  TUIC:      ${P_TUIC}"
+echo "  Mixed:     $P_MIXED"
+echo "  VLESS:     $P_VLESS"
+echo "  VMess:     $P_VMESS"
+echo "  Hysteria2: $P_HY2"
+echo "  TUIC:      $P_TUIC"
 echo ""
 echo -e "${CYAN}UUID:${NC} $UUID"
 echo -e "${CYAN}Reality公钥:${NC} $REALITY_PUB"
