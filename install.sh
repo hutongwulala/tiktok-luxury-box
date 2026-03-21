@@ -182,6 +182,7 @@ SHOW_QR() {
     
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${YELLOW}🔗 $TAG_VLESS${NC}"
+    echo -e "${GREEN}适用: 抗封锁能力强，TikTok首选，推荐iOS/Android客户端${NC}"
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     VLESS_URL="vless://$UUID@$SERVER_IP:$P_VLESS?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.microsoft.com&fp=chrome&pb=$REALITY_PUB&sid=a1b2c3d4&type=tcp&headless=tls#${TAG_VLESS}-$DATE"
     echo "$VLESS_URL"
@@ -191,6 +192,7 @@ SHOW_QR() {
     
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${YELLOW}🔗 $TAG_VMESS${NC}"
+    echo -e "${GREEN}适用: 兼容性好，适合老旧设备或特殊网络环境${NC}"
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     VMESS_JSON="{\"v\":\"2\",\"ps\":\"${TAG_VMESS}\",\"add\":\"$SERVER_IP\",\"port\":\"$P_VMESS\",\"id\":\"$UUID\",\"net\":\"ws\",\"path\":\"/vmess-ws\",\"tls\":\"tls\"}"
     VMESS_LINK="vmess://$(echo -n "$VMESS_JSON" | base64 -w0)"
@@ -201,6 +203,7 @@ SHOW_QR() {
     
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${YELLOW}🔗 $TAG_HY2${NC}"
+    echo -e "${GREEN}适用: 高带宽需求，UDP转发，游戏/视频首选${NC}"
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     HY2_URL="hysteria2://${HY2_PASS}@${SERVER_IP}:${P_HY2}#${TAG_HY2}-$DATE"
     echo "$HY2_URL"
@@ -210,6 +213,7 @@ SHOW_QR() {
     
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${YELLOW}🔗 $TAG_TUIC${NC}"
+    echo -e "${GREEN}适用: 低延迟长连接，BBR拥塞控制，视频通话首选${NC}"
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     TUIC_URL="tuic://$UUID:${TUIC_PASS}@$SERVER_IP:$P_TUIC?congestion_control=bbr#${TAG_TUIC}-$DATE"
     echo "$TUIC_URL"
@@ -219,6 +223,7 @@ SHOW_QR() {
     
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${YELLOW}🔗 $TAG_MIXED${NC}"
+    echo -e "${GREEN}适用: 简单代理，浏览器插件/Surge/Clash直接使用${NC}"
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo "$SERVER_IP:$P_MIXED"
     echo "用户: tiktok"
