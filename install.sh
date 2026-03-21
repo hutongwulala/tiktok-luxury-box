@@ -65,6 +65,7 @@ EOFBBR
     P_VMESS=$((10000 + RANDOM % 50000))
     P_HY2=$((10000 + RANDOM % 50000))
     P_TUIC=$((10000 + RANDOM % 50000))
+    CREATE_DATE=$(date +%Y%m%d)
     
     mkdir -p /etc/sing-box /var/log/sing-box /etc/sing-box/certs
     
@@ -83,8 +84,10 @@ EOFBBR
       --arg uuid "$UUID" \
       --arg rpriv "$REALITY_PRIV" \
       --arg rpub "$REALITY_PUB" \
+      --arg date "$CREATE_DATE" \
       '{
       "log": {"level": "info", "output": "/var/log/sing-box/sing-box.log"},
+      "created": $date,
       "inbounds": [
         {"type": "mixed", "tag": "mixed-in", "listen": "0.0.0.0", "listen_port": ($mixed | tonumber), "sniff": true},
         {"type": "vless", "tag": "vless-in", "listen": "0.0.0.0", "listen_port": ($vless | tonumber), "users": [{"uuid": $uuid, "flow": "xtls-rprx-vision"}], "tls": {"enabled": true, "server_name": "www.microsoft.com", "reality": {"enabled": true, "handshake": {"server": "www.microsoft.com", "server_port": 443}, "private_key": $rpriv, "short_id": ["a1b2c3d4"]}}},
@@ -135,8 +138,9 @@ SHOW_QR() {
         apt update && apt install -y qrencode 2>/dev/null
     fi
     
+    DATE=$(jq -r '.created' /etc/sing-box/config.json 2>/dev/null || date +%Y%m%d)
+    
     echo -e "${CYAN}=============================================="
-    DATE=$(date +%Y%m%d)
     echo "  TikTok精装桶 - $DATE"
     echo "==============================================${NC}"
     echo ""
