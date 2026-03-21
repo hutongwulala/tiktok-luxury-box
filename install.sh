@@ -198,6 +198,9 @@ if systemctl is-active --quiet sing-box; then
     echo -e "${GREEN}==============================================${NC}"
     echo -e "${GREEN}  配置文件已保存到 /etc/sing-box/config.json${NC}"
     echo -e "${GREEN}==============================================${NC}"
+    
+    curl -sL https://raw.githubusercontent.com/hutongwulala/tiktok-luxury-box/main/show.sh -o /usr/local/bin/tiktok-show && chmod +x /usr/local/bin/tiktok-show
+    echo -e "${GREEN}查看节点命令: tiktok-show${NC}"
 else
     echo -e "${RED}[错误]${NC} 服务启动失败"
     journalctl -u sing-box -n 10 --no-pager
