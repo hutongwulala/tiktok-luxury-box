@@ -15,7 +15,7 @@ echo "  TikTok精装桶Pro - 一键安装"
 echo "==============================================${NC}"
 
 echo -e "${YELLOW}[1/5]${NC} 安装依赖..."
-apt update && apt install -y curl wget unzip sudo git jq net-tools openssl
+apt update && apt install -y curl wget unzip sudo git jq net-tools openssl qrencode
 echo -e "${GREEN}[OK]${NC}"
 
 echo -e "${YELLOW}[2/5]${NC} 开启BBR..."
@@ -139,6 +139,65 @@ if systemctl is-active --quiet sing-box; then
     echo "  Hysteria2: $P_HY2"
     echo "  TUIC:      $P_TUIC"
     echo ""
+    
+    echo -e "${CYAN}==============================================${NC}"
+    echo -e "${CYAN}        分享链接 & 二维码${NC}"
+    echo -e "${CYAN}==============================================${NC}"
+    echo ""
+    
+    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${YELLOW}🔗 VLESS Reality (推荐)${NC}"
+    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    VLESS_URL="vless://$UUID@$SERVER_IP:$P_VLESS?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.microsoft.com&fp=chrome&pb=$REALITY_PUB&sid=a1b2c3d4&type=tcp&headless=tls#TikTok-VLESS"
+    echo "$VLESS_URL"
+    echo ""
+    echo "$VLESS_URL" | qrencode -t UTF8
+    echo ""
+    
+    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${YELLOW}🔗 VMess WebSocket${NC}"
+    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    VMESS_JSON="{\"v\":\"2\",\"ps\":\"TikTok-VMess\",\"add\":\"$SERVER_IP\",\"port\":\"$P_VMESS\",\"id\":\"$UUID\",\"net\":\"ws\",\"path\":\"/vmess-ws\",\"tls\":\"tls\"}"
+    VMESS_LINK="vmess://$(echo -n "$VMESS_JSON" | base64 -w0)"
+    echo "$VMESS_LINK"
+    echo ""
+    echo "$VMESS_LINK" | qrencode -t UTF8
+    echo ""
+    
+    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${YELLOW}🔗 Hysteria2${NC}"
+    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    HY2_URL="hysteria2://hy2-password@$SERVER_IP:$P_HY2#TikTok-HY2"
+    echo "$HY2_URL"
+    echo ""
+    echo "$HY2_URL" | qrencode -t UTF8
+    echo ""
+    
+    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${YELLOW}🔗 TUIC${NC}"
+    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    TUIC_URL="tuic://$UUID:tuic-password@$SERVER_IP:$P_TUIC?congestion_control=bbr#TikTok-TUIC"
+    echo "$TUIC_URL"
+    echo ""
+    echo "$TUIC_URL" | qrencode -t UTF8
+    echo ""
+    
+    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${YELLOW}🔗 Mixed (HTTP/SOCKS5)${NC}"
+    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo "$SERVER_IP:$P_MIXED"
+    echo "用户: tiktok"
+    echo "密码: mixed-password"
+    echo ""
+    MIXED_URL="http://tiktok:mixed-password@$SERVER_IP:$P_MIXED"
+    echo "$MIXED_URL"
+    echo ""
+    echo "$MIXED_URL" | qrencode -t UTF8
+    echo ""
+    
+    echo -e "${GREEN}==============================================${NC}"
+    echo -e "${GREEN}  配置文件已保存到 /etc/sing-box/config.json${NC}"
+    echo -e "${GREEN}==============================================${NC}"
 else
     echo -e "${RED}[错误]${NC} 服务启动失败"
     journalctl -u sing-box -n 10 --no-pager
