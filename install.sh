@@ -136,7 +136,8 @@ SHOW_QR() {
     fi
     
     echo -e "${CYAN}=============================================="
-    echo "  节点信息"
+    DATE=$(date +%Y%m%d)
+    echo "  TikTok精装桶 - $DATE"
     echo "==============================================${NC}"
     echo ""
     
@@ -172,7 +173,7 @@ SHOW_QR() {
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${YELLOW}🔗 VLESS Reality (推荐)${NC}"
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    VLESS_URL="vless://$UUID@$SERVER_IP:$P_VLESS?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.microsoft.com&fp=chrome&pb=$REALITY_PUB&sid=a1b2c3d4&type=tcp&headless=tls#TikTok-VLESS"
+    VLESS_URL="vless://$UUID@$SERVER_IP:$P_VLESS?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.microsoft.com&fp=chrome&pb=$REALITY_PUB&sid=a1b2c3d4&type=tcp&headless=tls#TikTok-VLESS-$DATE"
     echo "$VLESS_URL"
     echo ""
     echo "$VLESS_URL" | qrencode -t UTF8
@@ -181,7 +182,7 @@ SHOW_QR() {
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${YELLOW}🔗 VMess WebSocket${NC}"
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    VMESS_JSON="{\"v\":\"2\",\"ps\":\"TikTok-VMess\",\"add\":\"$SERVER_IP\",\"port\":\"$P_VMESS\",\"id\":\"$UUID\",\"net\":\"ws\",\"path\":\"/vmess-ws\",\"tls\":\"tls\"}"
+    VMESS_JSON="{\"v\":\"2\",\"ps\":\"TikTok-VMess-$DATE\",\"add\":\"$SERVER_IP\",\"port\":\"$P_VMESS\",\"id\":\"$UUID\",\"net\":\"ws\",\"path\":\"/vmess-ws\",\"tls\":\"tls\"}"
     VMESS_LINK="vmess://$(echo -n "$VMESS_JSON" | base64 -w0)"
     echo "$VMESS_LINK"
     echo ""
@@ -191,7 +192,7 @@ SHOW_QR() {
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${YELLOW}🔗 Hysteria2${NC}"
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    HY2_URL="hysteria2://${HY2_PASS}@${SERVER_IP}:${P_HY2}#TikTok-HY2"
+    HY2_URL="hysteria2://${HY2_PASS}@${SERVER_IP}:${P_HY2}#TikTok-HY2-$DATE"
     echo "$HY2_URL"
     echo ""
     echo "$HY2_URL" | qrencode -t UTF8
@@ -200,7 +201,7 @@ SHOW_QR() {
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${YELLOW}🔗 TUIC${NC}"
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    TUIC_URL="tuic://$UUID:${TUIC_PASS}@$SERVER_IP:$P_TUIC?congestion_control=bbr#TikTok-TUIC"
+    TUIC_URL="tuic://$UUID:${TUIC_PASS}@$SERVER_IP:$P_TUIC?congestion_control=bbr#TikTok-TUIC-$DATE"
     echo "$TUIC_URL"
     echo ""
     echo "$TUIC_URL" | qrencode -t UTF8
@@ -213,7 +214,7 @@ SHOW_QR() {
     echo "用户: tiktok"
     echo "密码: mixed-password"
     echo ""
-    MIXED_URL="http://tiktok:mixed-password@$SERVER_IP:$P_MIXED"
+    MIXED_URL="http://tiktok:mixed-password@$SERVER_IP:$P_MIXED#TikTok-Mixed-$DATE"
     echo "$MIXED_URL"
     echo ""
     echo "$MIXED_URL" | qrencode -t UTF8
