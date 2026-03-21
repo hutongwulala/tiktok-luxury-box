@@ -156,9 +156,7 @@ jq -n \
       ],
       "transport": {
         "type": "ws",
-        "ws": {
-          "path": "/vmess-ws"
-        }
+        "path": "/vmess-ws"
       },
       "tls": {
         "enabled": true,
