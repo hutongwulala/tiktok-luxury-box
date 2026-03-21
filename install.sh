@@ -89,11 +89,11 @@ EOFBBR
       "log": {"level": "info", "output": "/var/log/sing-box/sing-box.log"},
       "created": $date,
       "inbounds": [
-        {"type": "mixed", "tag": "mixed-in", "listen": "0.0.0.0", "listen_port": ($mixed | tonumber), "sniff": true},
-        {"type": "vless", "tag": "vless-in", "listen": "0.0.0.0", "listen_port": ($vless | tonumber), "users": [{"uuid": $uuid, "flow": "xtls-rprx-vision"}], "tls": {"enabled": true, "server_name": "www.microsoft.com", "reality": {"enabled": true, "handshake": {"server": "www.microsoft.com", "server_port": 443}, "private_key": $rpriv, "short_id": ["a1b2c3d4"]}}},
-        {"type": "vmess", "tag": "vmess-in", "listen": "0.0.0.0", "listen_port": ($vmess | tonumber), "users": [{"uuid": $uuid}], "transport": {"type": "ws", "path": "/vmess-ws"}, "tls": {"enabled": true, "certificate_path": "/etc/sing-box/certs/cert.pem", "key_path": "/etc/sing-box/certs/key.pem"}},
-        {"type": "hysteria2", "tag": "hy2-in", "listen": "0.0.0.0", "listen_port": ($hy2 | tonumber), "users": [{"password": "hy2-password"}], "tls": {"enabled": true, "certificate_path": "/etc/sing-box/certs/cert.pem", "key_path": "/etc/sing-box/certs/key.pem"}},
-        {"type": "tuic", "tag": "tuic-in", "listen": "0.0.0.0", "listen_port": ($tuic | tonumber), "users": [{"uuid": $uuid, "password": "tuic-password"}], "congestion_control": "bbr", "tls": {"enabled": true, "certificate_path": "/etc/sing-box/certs/cert.pem", "key_path": "/etc/sing-box/certs/key.pem"}}
+        {"type": "mixed", "tag": "Anytls", "listen": "0.0.0.0", "listen_port": ($mixed | tonumber), "sniff": true},
+        {"type": "vless", "tag": "Vless-reality-vision", "listen": "0.0.0.0", "listen_port": ($vless | tonumber), "users": [{"uuid": $uuid, "flow": "xtls-rprx-vision"}], "tls": {"enabled": true, "server_name": "www.microsoft.com", "reality": {"enabled": true, "handshake": {"server": "www.microsoft.com", "server_port": 443}, "private_key": $rpriv, "short_id": ["a1b2c3d4"]}}},
+        {"type": "vmess", "tag": "Vmess-ws-tls-Argo", "listen": "0.0.0.0", "listen_port": ($vmess | tonumber), "users": [{"uuid": $uuid}], "transport": {"type": "ws", "path": "/vmess-ws"}, "tls": {"enabled": true, "certificate_path": "/etc/sing-box/certs/cert.pem", "key_path": "/etc/sing-box/certs/key.pem"}},
+        {"type": "hysteria2", "tag": "Hysteria-2", "listen": "0.0.0.0", "listen_port": ($hy2 | tonumber), "users": [{"password": "hy2-password"}], "tls": {"enabled": true, "certificate_path": "/etc/sing-box/certs/cert.pem", "key_path": "/etc/sing-box/certs/key.pem"}},
+        {"type": "tuic", "tag": "Tuic-v5", "listen": "0.0.0.0", "listen_port": ($tuic | tonumber), "users": [{"uuid": $uuid, "password": "tuic-password"}], "congestion_control": "bbr", "tls": {"enabled": true, "certificate_path": "/etc/sing-box/certs/cert.pem", "key_path": "/etc/sing-box/certs/key.pem"}}
       ],
       "outbounds": [{"type": "direct", "tag": "direct"}, {"type": "block", "tag": "block"}],
       "route": {"rules": []}
