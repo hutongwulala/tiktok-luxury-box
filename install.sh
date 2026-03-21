@@ -1,9 +1,8 @@
 #!/bin/bash
 # ============================================
-# TikTok精装桶Pro - VPS专用一键脚本 v1.0.5
+# TikTok精装桶Pro - VPS专用一键脚本 v1.0.6
 # 多协议 + BBR加速 + 自动故障切换
-# 修复: listen_ports -> listen_port (sing-box 1.13+ 兼容)
-# 注意: heredoc使用不带引号的EOF以展开变量
+# 修复: 移除inbound中多余的protocol字段 (sing-box 1.13+)
 # ============================================
 
 set -e
@@ -40,7 +39,7 @@ PORT_MIXED=$(random_port)
 
 echo -e "${CYAN}"
 echo "=============================================="
-echo "  TikTok精装桶Pro - 一键安装脚本 v1.0.5"
+echo "  TikTok精装桶Pro - 一键安装脚本 v1.0.6"
 echo "=============================================="
 echo -e "${NC}"
 
@@ -130,17 +129,17 @@ mkdir -p /etc/sing-box /var/log/sing-box
 # 备份旧配置
 [[ -f /etc/sing-box/config.json ]] && cp /etc/sing-box/config.json /etc/sing-box/config.json.bak.$(date +%Y%m%d%H%M%S)
 
-# 生成配置文件 - 使用EOF不带引号让变量展开
+# 生成配置文件 - 注意: inbound中不要protocol字段,协议类型由type决定
 cat > /etc/sing-box/config.json << CONFIGEOF
 {
   "log": {"level": "info", "output": "/var/log/sing-box/sing-box.log"},
   "inbounds": [
     {"type": "mixed", "tag": "mixed-in", "listen": "0.0.0.0", "listen_port": ${PORT_MIXED}, "sniff": true, "sniff_override_destination": true},
-    {"type": "vless", "tag": "vless-reality-in", "listen": "0.0.0.0", "listen_port": ${PORT_VLESS}, "protocol": "vless", "settings": {"clients": [{"id": "${UUID}", "flow": "xtls-rprx-vision"}], "decryption": "none"}, "tls": {"enabled": true, "server_name": "www.apple.com", "reality": {"enabled": true, "handshake": {"server": "www.apple.com", "server_port": 443}, "dest": "www.apple.com:443", "private_key": "${REALITY_PRIV}", "short_id": [""]}}},
-    {"type": "vmess", "tag": "vmess-ws-in", "listen": "0.0.0.0", "listen_port": ${PORT_VMESS}, "protocol": "vmess", "settings": {"clients": [{"id": "${UUID}", "alterId": 0}]}, "transport": {"type": "ws", "ws": {"path": "/vmess-ws"}}, "tls": {"enabled": true, "server_name": "cloudflare.com"}},
-    {"type": "hysteria2", "tag": "hysteria2-in", "listen": "0.0.0.0", "listen_port": ${PORT_HYSTERIA}, "protocol": "hysteria2", "settings": {"auth": {"type": "password", "password": "${HYSTERIA_PWD}"}}, "tls": {"enabled": true, "server_name": "www.google.com"}},
-    {"type": "tuic", "tag": "tuic-in", "listen": "0.0.0.0", "listen_port": ${PORT_TUIC}, "protocol": "tuic", "settings": {"users": [{"uuid": "${TUIC_UUID}", "password": "${TUIC_PASSWORD}"}], "congestion_control": "bbr"}, "tls": {"enabled": true, "server_name": "www.microsoft.com"}},
-    {"type": "naive", "tag": "naive-in", "listen": "0.0.0.0", "listen_port": ${PORT_ANYTLS}, "protocol": "naive", "settings": {"users": [{"username": "tiktok", "password": "tiktok123"}]}, "tls": {"enabled": true, "server_name": "www.amazon.com"}}
+    {"type": "vless", "tag": "vless-reality-in", "listen": "0.0.0.0", "listen_port": ${PORT_VLESS}, "settings": {"clients": [{"id": "${UUID}", "flow": "xtls-rprx-vision"}], "decryption": "none"}, "tls": {"enabled": true, "server_name": "www.apple.com", "reality": {"enabled": true, "handshake": {"server": "www.apple.com", "server_port": 443}, "dest": "www.apple.com:443", "private_key": "${REALITY_PRIV}", "short_id": [""]}}},
+    {"type": "vmess", "tag": "vmess-ws-in", "listen": "0.0.0.0", "listen_port": ${PORT_VMESS}, "settings": {"clients": [{"id": "${UUID}", "alterId": 0}]}, "transport": {"type": "ws", "ws": {"path": "/vmess-ws"}}, "tls": {"enabled": true, "server_name": "cloudflare.com"}},
+    {"type": "hysteria2", "tag": "hysteria2-in", "listen": "0.0.0.0", "listen_port": ${PORT_HYSTERIA}, "settings": {"auth": {"type": "password", "password": "${HYSTERIA_PWD}"}}, "tls": {"enabled": true, "server_name": "www.google.com"}},
+    {"type": "tuic", "tag": "tuic-in", "listen": "0.0.0.0", "listen_port": ${PORT_TUIC}, "settings": {"users": [{"uuid": "${TUIC_UUID}", "password": "${TUIC_PASSWORD}"}], "congestion_control": "bbr"}, "tls": {"enabled": true, "server_name": "www.microsoft.com"}},
+    {"type": "naive", "tag": "naive-in", "listen": "0.0.0.0", "listen_port": ${PORT_ANYTLS}, "settings": {"users": [{"username": "tiktok", "password": "tiktok123"}]}, "tls": {"enabled": true, "server_name": "www.amazon.com"}}
   ],
   "outbounds": [
     {"type": "urltest", "tag": "auto", "outbounds": ["direct"], "default": "direct", "url": "https://www.tiktok.com", "interval": "10m"},
