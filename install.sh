@@ -150,7 +150,7 @@ jq -n \
       "listen_port": ($vmess | tonumber),
       "users": [
         {
-          "id": $uuid,
+          "uuid": $uuid,
           "alterId": 0
         }
       ],
