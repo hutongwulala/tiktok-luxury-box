@@ -14,7 +14,7 @@ CHECK_INSTALL() {
 
 INSTALL() {
     echo -e "${CYAN}=============================================="
-    echo "  TikTok精装桶Pro - 一键安装"
+    echo "  跨境专线盒Pro - 一键安装"
     echo "==============================================${NC}"
     
     echo -e "${YELLOW}[1/5]${NC} 安装依赖..."
@@ -141,7 +141,7 @@ SHOW_QR() {
     DATE=$(cat /etc/sing-box/.date 2>/dev/null || date +%Y%m%d)
     
     echo -e "${CYAN}=============================================="
-    echo "  TikTok精装桶 - $DATE"
+    echo "  跨境专线盒Pro - $DATE"
     echo "==============================================${NC}"
     echo ""
     
@@ -166,7 +166,7 @@ SHOW_QR() {
     
     echo ""
     echo -e "${CYAN}╔══════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║           TikTok精装桶Pro  -  $DATE              ║${NC}"
+    echo -e "${CYAN}║           跨境专线盒Pro  -  $DATE              ║${NC}"
     echo -e "${CYAN}╚══════════════════════════════════════════════════╝${NC}"
     echo ""
     echo -e "  ${GREEN}●${NC} ${YELLOW}服务器IP:${NC} $SERVER_IP"
@@ -244,10 +244,10 @@ SHOW_QR() {
             echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
             echo "服务器: $SERVER_IP"
             echo "端口: $P_MIXED"
-            echo "用户: tiktok"
-            echo "密码: mixed-password"
+            echo "用户: kuajing"
+            echo "密码: kuajing-password"
             echo ""
-            MIXED_URL="http://tiktok:mixed-password@$SERVER_IP:$P_MIXED#${TAG_MIXED}-$DATE"
+            MIXED_URL="http://kuajing:kuajing-password@$SERVER_IP:$P_MIXED#${TAG_MIXED}-$DATE"
             echo "$MIXED_URL"
             echo ""
             echo "$MIXED_URL" | qrencode -t UTF8
@@ -262,7 +262,7 @@ SHOW_QR() {
 MAIN_MENU() {
     while true; do
         echo -e "${CYAN}=============================================="
-        echo "  TikTok精装桶Pro"
+        echo "  跨境专线盒Pro"
         echo "==============================================${NC}"
         echo ""
         echo -e "${YELLOW}  1)${NC} 查看节点链接和二维码"
