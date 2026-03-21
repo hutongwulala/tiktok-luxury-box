@@ -138,7 +138,6 @@ jq -n \
             "server": "www.microsoft.com",
             "server_port": 443
           },
-          "dest": "www.microsoft.com:443",
           "private_key": $rpriv,
           "short_id": ["a1b2c3d4"]
         }
