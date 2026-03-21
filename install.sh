@@ -158,15 +158,21 @@ SHOW_QR() {
     HY2_PASS=$(jq -r '.inbounds[] | select(.type=="hysteria2") | .users[0].password' /etc/sing-box/config.json 2>/dev/null)
     TUIC_PASS=$(jq -r '.inbounds[] | select(.type=="tuic") | .users[0].password' /etc/sing-box/config.json 2>/dev/null)
     
+    TAG_MIXED=$(jq -r '.inbounds[] | select(.type=="mixed") | .tag' /etc/sing-box/config.json 2>/dev/null)
+    TAG_VLESS=$(jq -r '.inbounds[] | select(.type=="vless") | .tag' /etc/sing-box/config.json 2>/dev/null)
+    TAG_VMESS=$(jq -r '.inbounds[] | select(.type=="vmess") | .tag' /etc/sing-box/config.json 2>/dev/null)
+    TAG_HY2=$(jq -r '.inbounds[] | select(.type=="hysteria2") | .tag' /etc/sing-box/config.json 2>/dev/null)
+    TAG_TUIC=$(jq -r '.inbounds[] | select(.type=="tuic") | .tag' /etc/sing-box/config.json 2>/dev/null)
+    
     echo -e "${YELLOW}服务器IP:${NC} $SERVER_IP"
     echo -e "${YELLOW}UUID:${NC} $UUID"
     echo ""
     echo -e "${CYAN}端口信息:${NC}"
-    echo "  Mixed:     $P_MIXED"
-    echo "  VLESS:     $P_VLESS"
-    echo "  VMess:     $P_VMESS"
-    echo "  Hysteria2: $P_HY2"
-    echo "  TUIC:      $P_TUIC"
+    echo "  $TAG_MIXED:  $P_MIXED"
+    echo "  $TAG_VLESS:  $P_VLESS"
+    echo "  $TAG_VMESS:  $P_VMESS"
+    echo "  $TAG_HY2:    $P_HY2"
+    echo "  $TAG_TUIC:   $P_TUIC"
     echo ""
     
     echo -e "${CYAN}==============================================${NC}"
@@ -175,18 +181,18 @@ SHOW_QR() {
     echo ""
     
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${YELLOW}🔗 Vless-reality-vision${NC}"
+    echo -e "${YELLOW}🔗 $TAG_VLESS${NC}"
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    VLESS_URL="vless://$UUID@$SERVER_IP:$P_VLESS?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.microsoft.com&fp=chrome&pb=$REALITY_PUB&sid=a1b2c3d4&type=tcp&headless=tls#TikTok-$DATE"
+    VLESS_URL="vless://$UUID@$SERVER_IP:$P_VLESS?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.microsoft.com&fp=chrome&pb=$REALITY_PUB&sid=a1b2c3d4&type=tcp&headless=tls#${TAG_VLESS}-$DATE"
     echo "$VLESS_URL"
     echo ""
     echo "$VLESS_URL" | qrencode -t UTF8
     echo ""
     
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${YELLOW}🔗 Vmess-ws(tls)/Argo${NC}"
+    echo -e "${YELLOW}🔗 $TAG_VMESS${NC}"
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    VMESS_JSON="{\"v\":\"2\",\"ps\":\"$DATE\",\"add\":\"$SERVER_IP\",\"port\":\"$P_VMESS\",\"id\":\"$UUID\",\"net\":\"ws\",\"path\":\"/vmess-ws\",\"tls\":\"tls\"}"
+    VMESS_JSON="{\"v\":\"2\",\"ps\":\"${TAG_VMESS}\",\"add\":\"$SERVER_IP\",\"port\":\"$P_VMESS\",\"id\":\"$UUID\",\"net\":\"ws\",\"path\":\"/vmess-ws\",\"tls\":\"tls\"}"
     VMESS_LINK="vmess://$(echo -n "$VMESS_JSON" | base64 -w0)"
     echo "$VMESS_LINK"
     echo ""
@@ -194,31 +200,31 @@ SHOW_QR() {
     echo ""
     
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${YELLOW}🔗 Hysteria-2${NC}"
+    echo -e "${YELLOW}🔗 $TAG_HY2${NC}"
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    HY2_URL="hysteria2://${HY2_PASS}@${SERVER_IP}:${P_HY2}#Hysteria-2-$DATE"
+    HY2_URL="hysteria2://${HY2_PASS}@${SERVER_IP}:${P_HY2}#${TAG_HY2}-$DATE"
     echo "$HY2_URL"
     echo ""
     echo "$HY2_URL" | qrencode -t UTF8
     echo ""
     
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${YELLOW}🔗 Tuic-v5${NC}"
+    echo -e "${YELLOW}🔗 $TAG_TUIC${NC}"
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    TUIC_URL="tuic://$UUID:${TUIC_PASS}@$SERVER_IP:$P_TUIC?congestion_control=bbr#Tuic-v5-$DATE"
+    TUIC_URL="tuic://$UUID:${TUIC_PASS}@$SERVER_IP:$P_TUIC?congestion_control=bbr#${TAG_TUIC}-$DATE"
     echo "$TUIC_URL"
     echo ""
     echo "$TUIC_URL" | qrencode -t UTF8
     echo ""
     
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${YELLOW}🔗 Anytls${NC}"
+    echo -e "${YELLOW}🔗 $TAG_MIXED${NC}"
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo "$SERVER_IP:$P_MIXED"
     echo "用户: tiktok"
     echo "密码: mixed-password"
     echo ""
-    MIXED_URL="http://tiktok:mixed-password@$SERVER_IP:$P_MIXED#Anytls-$DATE"
+    MIXED_URL="http://tiktok:mixed-password@$SERVER_IP:$P_MIXED#${TAG_MIXED}-$DATE"
     echo "$MIXED_URL"
     echo ""
     echo "$MIXED_URL" | qrencode -t UTF8
