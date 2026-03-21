@@ -1,6 +1,7 @@
 #!/bin/bash
 # ============================================
-# TikTok精装桶Pro - 交互式安装脚本 v2.0
+# TikTok精装桶Pro - 交互式安装脚本 v2.1
+# 按回车继续，自动继续安装
 # ============================================
 
 RED='\033[0;31m'
@@ -10,9 +11,15 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
+# 按回车继续
+press_enter() {
+    echo -e "${YELLOW}按回车继续...${NC}"
+    read
+}
+
 # 检查root
 if [[ $EUID -ne 0 ]]; then
-    echo -e "${RED}[错误]${NC} 需要root权限运行！"
+    echo -e "${RED}[错误]${NC} 需要root权限！"
     exit 1
 fi
 
@@ -20,19 +27,10 @@ echo -e "${CYAN}=============================================="
 echo "  TikTok精装桶Pro - 交互式安装"
 echo "==============================================${NC}"
 
-# 确认开始
-echo ""
-read -p "是否开始安装？(y/n): " confirm
-if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
-    echo "已取消"
-    exit 0
-fi
+press_enter
 
 # 步骤1: 安装依赖
 echo -e "${YELLOW}[步骤1/5]${NC} 安装依赖..."
-echo "将安装: curl wget unzip sudo git jq"
-read -p "继续?(y/n): " confirm
-if [[ "$confirm" != "y" ]]; then exit 0; fi
 
 if [[ -f /etc/debian_version ]]; then
     apt update && apt install -y curl wget unzip sudo git jq net-tools
@@ -43,10 +41,10 @@ elif [[ -f /etc/alpine-release ]]; then
 fi
 echo -e "${GREEN}[OK]${NC} 依赖安装完成"
 
+press_enter
+
 # 步骤2: BBR
 echo -e "${YELLOW}[步骤2/5]${NC} 开启BBR..."
-read -p "继续?(y/n): " confirm
-if [[ "$confirm" != "y" ]]; then exit 0; fi
 
 if ! grep -q "net.core.default_qdisc = fq" /etc/sysctl.conf; then
     cat >> /etc/sysctl.conf << 'EOF'
@@ -58,10 +56,10 @@ EOF
 fi
 echo -e "${GREEN}[OK]${NC} BBR完成"
 
+press_enter
+
 # 步骤3: 安装sing-box
 echo -e "${YELLOW}[步骤3/5]${NC} 安装sing-box..."
-read -p "继续?(y/n): " confirm
-if [[ "$confirm" != "y" ]]; then exit 0; fi
 
 if command -v sing-box &>/dev/null; then
     echo -e "${GREEN}[OK]${NC} sing-box已安装: $(sing-box version | head -1)"
@@ -92,19 +90,17 @@ else
     fi
 fi
 
+press_enter
+
 # 步骤4: 生成配置
 echo -e "${YELLOW}[步骤4/5]${NC} 生成配置..."
-read -p "继续?(y/n): " confirm
-if [[ "$confirm" != "y" ]]; then exit 0; fi
 
-# 获取信息
 SERVER_IP=$(curl -s ifconfig.me 2>/dev/null || curl -s ip.sb 2>/dev/null || echo "未知IP")
 echo "服务器IP: $SERVER_IP"
 
 UUID=$(cat /proc/sys/kernel/random/uuid)
 echo "UUID: $UUID"
 
-# Reality密钥
 echo "生成Reality密钥..."
 KEYS=$(sing-box generate reality-keypair 2>/dev/null || echo "PRIVATE_KEY:xxx\nPUBLIC_KEY:xxx")
 REALITY_PRIV=$(echo "$KEYS" | grep PrivateKey: | cut -d: -f2 | tr -d ' ')
@@ -112,7 +108,6 @@ REALITY_PUB=$(echo "$KEYS" | grep PublicKey: | cut -d: -f2 | tr -d ' ')
 [[ -z "$REALITY_PRIV" ]] && REALITY_PRIV="xxx" && REALITY_PUB="xxx"
 echo "Reality公钥: $REALITY_PUB"
 
-# 端口
 echo ""
 echo "使用随机端口:"
 P_MIXED=$((10000 + RANDOM % 50000))
@@ -129,11 +124,9 @@ echo "  TUIC:      $P_TUIC"
 
 mkdir -p /etc/sing-box /var/log/sing-box
 
-# 生成JSON配置
 echo ""
 echo "生成配置文件..."
 
-# 使用jq生成干净的JSON
 jq -n \
   --arg ip "$SERVER_IP" \
   --arg mixed "$P_MIXED" \
@@ -207,18 +200,16 @@ jq -n \
   "route": {"rules": []}
 }' > /etc/sing-box/config.json
 
-echo -e "${GREEN}[OK]${NC} 配置已保存到 /etc/sing-box/config.json"
+echo -e "${GREEN}[OK]${NC} 配置已保存"
 
-# 显示配置
 echo ""
 echo "配置文件内容:"
 cat /etc/sing-box/config.json
 
+press_enter
+
 # 步骤5: 启动服务
-echo ""
 echo -e "${YELLOW}[步骤5/5]${NC} 启动服务..."
-read -p "启动sing-box服务?(y/n): " confirm
-if [[ "$confirm" != "y" ]]; then exit 0; fi
 
 cat > /etc/systemd/system/sing-box.service << 'SVCEOF'
 [Unit]
