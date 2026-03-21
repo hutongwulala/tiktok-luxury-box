@@ -84,10 +84,8 @@ EOFBBR
       --arg uuid "$UUID" \
       --arg rpriv "$REALITY_PRIV" \
       --arg rpub "$REALITY_PUB" \
-      --arg date "$CREATE_DATE" \
       '{
       "log": {"level": "info", "output": "/var/log/sing-box/sing-box.log"},
-      "created": $date,
       "inbounds": [
         {"type": "mixed", "tag": "Anytls", "listen": "0.0.0.0", "listen_port": ($mixed | tonumber), "sniff": true},
         {"type": "vless", "tag": "Vless-reality-vision", "listen": "0.0.0.0", "listen_port": ($vless | tonumber), "users": [{"uuid": $uuid, "flow": "xtls-rprx-vision"}], "tls": {"enabled": true, "server_name": "www.microsoft.com", "reality": {"enabled": true, "handshake": {"server": "www.microsoft.com", "server_port": 443}, "private_key": $rpriv, "short_id": ["a1b2c3d4"]}}},
@@ -98,6 +96,8 @@ EOFBBR
       "outbounds": [{"type": "direct", "tag": "direct"}, {"type": "block", "tag": "block"}],
       "route": {"rules": []}
     }' > /etc/sing-box/config.json
+    
+    echo "$CREATE_DATE" > /etc/sing-box/.date
     
     echo -e "${GREEN}[OK]${NC} 配置已保存"
     
@@ -138,7 +138,7 @@ SHOW_QR() {
         apt update && apt install -y qrencode 2>/dev/null
     fi
     
-    DATE=$(jq -r '.created' /etc/sing-box/config.json 2>/dev/null || date +%Y%m%d)
+    DATE=$(cat /etc/sing-box/.date 2>/dev/null || date +%Y%m%d)
     
     echo -e "${CYAN}=============================================="
     echo "  TikTok精装桶 - $DATE"
