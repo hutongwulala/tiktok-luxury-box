@@ -164,75 +164,98 @@ SHOW_QR() {
     TAG_HY2=$(jq -r '.inbounds[] | select(.type=="hysteria2") | .tag' /etc/sing-box/config.json 2>/dev/null)
     TAG_TUIC=$(jq -r '.inbounds[] | select(.type=="tuic") | .tag' /etc/sing-box/config.json 2>/dev/null)
     
-    echo -e "${YELLOW}服务器IP:${NC} $SERVER_IP"
-    echo -e "${YELLOW}UUID:${NC} $UUID"
     echo ""
-    echo -e "${CYAN}端口信息:${NC}"
-    echo "  $TAG_MIXED:  $P_MIXED"
-    echo "  $TAG_VLESS:  $P_VLESS"
-    echo "  $TAG_VMESS:  $P_VMESS"
-    echo "  $TAG_HY2:    $P_HY2"
-    echo "  $TAG_TUIC:   $P_TUIC"
+    echo -e "${CYAN}╔══════════════════════════════════════════════════╗${NC}"
+    echo -e "${CYAN}║           TikTok精装桶Pro  -  $DATE              ║${NC}"
+    echo -e "${CYAN}╚══════════════════════════════════════════════════╝${NC}"
     echo ""
+    echo -e "  ${GREEN}●${NC} ${YELLOW}服务器IP:${NC} $SERVER_IP"
+    echo -e "  ${GREEN}●${NC} ${YELLOW}UUID:${NC} $UUID"
+    echo ""
+    echo -e "${CYAN}┌──────────────────────────────────────────────────┐${NC}"
+    echo -e "${CYAN}│${NC}                   节点列表                    ${CYAN}│${NC}"
+    echo -e "${CYAN}├──────────────────────────────────────────────────┤${NC}"
+    echo -e "${CYAN}│${NC} 1. $TAG_VLESS           :$P_VLESS              ${CYAN}│${NC}"
+    echo -e "${CYAN}│${NC}    协议: VLESS/XTLS-RPRX-VISION/TCP          ${CYAN}│${NC}"
+    echo -e "${CYAN}│${NC}    适用: TikTok首选,抗封锁强                ${CYAN}│${NC}"
+    echo -e "${CYAN}├──────────────────────────────────────────────────┤${NC}"
+    echo -e "${CYAN}│${NC} 2. $TAG_VMESS        :$P_VMESS             ${CYAN}│${NC}"
+    echo -e "${CYAN}│${NC}    协议: VMESS/WS/TLS                       ${CYAN}│${NC}"
+    echo -e "${CYAN}│${NC}    适用: 兼容性好,老旧设备                  ${CYAN}│${NC}"
+    echo -e "${CYAN}├──────────────────────────────────────────────────┤${NC}"
+    echo -e "${CYAN}│${NC} 3. $TAG_HY2            :$P_HY2              ${CYAN}│${NC}"
+    echo -e "${CYAN}│${NC}    协议: HYSTERIA2/UDP                      ${CYAN}│${NC}"
+    echo -e "${CYAN}│${NC}    适用: 高带宽,游戏/视频首选                ${CYAN}│${NC}"
+    echo -e "${CYAN}├──────────────────────────────────────────────────┤${NC}"
+    echo -e "${CYAN}│${NC} 4. $TAG_TUIC             :$P_TUIC             ${CYAN}│${NC}"
+    echo -e "${CYAN}│${NC}    协议: TUIC/UDP/BBR                       ${CYAN}│${NC}"
+    echo -e "${CYAN}│${NC}    适用: 低延迟,视频通话首选                 ${CYAN}│${NC}"
+    echo -e "${CYAN}├──────────────────────────────────────────────────┤${NC}"
+    echo -e "${CYAN}│${NC} 5. $TAG_MIXED           :$P_MIXED              ${CYAN}│${NC}"
+    echo -e "${CYAN}│${NC}    协议: HTTP/SOCKS5                        ${CYAN}│${NC}"
+    echo -e "${CYAN}│${NC}    适用: 浏览器插件/Clash直接使用           ${CYAN}│${NC}"
+    echo -e "${CYAN}└──────────────────────────────────────────────────┘${NC}"
+    echo ""
+    echo -e "${YELLOW}选择节点编号查看链接和二维码 [1-5]: ${NC}"
+    read choice
     
-    echo -e "${CYAN}==============================================${NC}"
-    echo -e "${CYAN}        分享链接 & 二维码${NC}"
-    echo -e "${CYAN}==============================================${NC}"
     echo ""
-    
-    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${YELLOW}🔗 $TAG_VLESS${NC}"
-    echo -e "${GREEN}适用: 抗封锁能力强，TikTok首选，推荐iOS/Android客户端${NC}"
-    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    VLESS_URL="vless://$UUID@$SERVER_IP:$P_VLESS?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.microsoft.com&fp=chrome&pb=$REALITY_PUB&sid=a1b2c3d4&type=tcp&headless=tls#${TAG_VLESS}-$DATE"
-    echo "$VLESS_URL"
-    echo ""
-    echo "$VLESS_URL" | qrencode -t UTF8
-    echo ""
-    
-    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${YELLOW}🔗 $TAG_VMESS${NC}"
-    echo -e "${GREEN}适用: 兼容性好，适合老旧设备或特殊网络环境${NC}"
-    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    VMESS_JSON="{\"v\":\"2\",\"ps\":\"${TAG_VMESS}\",\"add\":\"$SERVER_IP\",\"port\":\"$P_VMESS\",\"id\":\"$UUID\",\"net\":\"ws\",\"path\":\"/vmess-ws\",\"tls\":\"tls\"}"
-    VMESS_LINK="vmess://$(echo -n "$VMESS_JSON" | base64 -w0)"
-    echo "$VMESS_LINK"
-    echo ""
-    echo "$VMESS_LINK" | qrencode -t UTF8
-    echo ""
-    
-    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${YELLOW}🔗 $TAG_HY2${NC}"
-    echo -e "${GREEN}适用: 高带宽需求，UDP转发，游戏/视频首选${NC}"
-    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    HY2_URL="hysteria2://${HY2_PASS}@${SERVER_IP}:${P_HY2}#${TAG_HY2}-$DATE"
-    echo "$HY2_URL"
-    echo ""
-    echo "$HY2_URL" | qrencode -t UTF8
-    echo ""
-    
-    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${YELLOW}🔗 $TAG_TUIC${NC}"
-    echo -e "${GREEN}适用: 低延迟长连接，BBR拥塞控制，视频通话首选${NC}"
-    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    TUIC_URL="tuic://$UUID:${TUIC_PASS}@$SERVER_IP:$P_TUIC?congestion_control=bbr#${TAG_TUIC}-$DATE"
-    echo "$TUIC_URL"
-    echo ""
-    echo "$TUIC_URL" | qrencode -t UTF8
-    echo ""
-    
-    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${YELLOW}🔗 $TAG_MIXED${NC}"
-    echo -e "${GREEN}适用: 简单代理，浏览器插件/Surge/Clash直接使用${NC}"
-    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo "$SERVER_IP:$P_MIXED"
-    echo "用户: tiktok"
-    echo "密码: mixed-password"
-    echo ""
-    MIXED_URL="http://tiktok:mixed-password@$SERVER_IP:$P_MIXED#${TAG_MIXED}-$DATE"
-    echo "$MIXED_URL"
-    echo ""
-    echo "$MIXED_URL" | qrencode -t UTF8
+    case $choice in
+        1)
+            echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            echo -e "${CYAN} $TAG_VLESS ${NC}"
+            echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            VLESS_URL="vless://$UUID@$SERVER_IP:$P_VLESS?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.microsoft.com&fp=chrome&pb=$REALITY_PUB&sid=a1b2c3d4&type=tcp&headless=tls#${TAG_VLESS}-$DATE"
+            echo "$VLESS_URL"
+            echo ""
+            echo "$VLESS_URL" | qrencode -t UTF8
+            ;;
+        2)
+            echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            echo -e "${CYAN} $TAG_VMESS ${NC}"
+            echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            VMESS_JSON="{\"v\":\"2\",\"ps\":\"${TAG_VMESS}\",\"add\":\"$SERVER_IP\",\"port\":\"$P_VMESS\",\"id\":\"$UUID\",\"net\":\"ws\",\"path\":\"/vmess-ws\",\"tls\":\"tls\"}"
+            VMESS_LINK="vmess://$(echo -n "$VMESS_JSON" | base64 -w0)"
+            echo "$VMESS_LINK"
+            echo ""
+            echo "$VMESS_LINK" | qrencode -t UTF8
+            ;;
+        3)
+            echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            echo -e "${CYAN} $TAG_HY2 ${NC}"
+            echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            HY2_URL="hysteria2://${HY2_PASS}@${SERVER_IP}:${P_HY2}#${TAG_HY2}-$DATE"
+            echo "$HY2_URL"
+            echo ""
+            echo "$HY2_URL" | qrencode -t UTF8
+            ;;
+        4)
+            echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            echo -e "${CYAN} $TAG_TUIC ${NC}"
+            echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            TUIC_URL="tuic://$UUID:${TUIC_PASS}@$SERVER_IP:$P_TUIC?congestion_control=bbr#${TAG_TUIC}-$DATE"
+            echo "$TUIC_URL"
+            echo ""
+            echo "$TUIC_URL" | qrencode -t UTF8
+            ;;
+        5)
+            echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            echo -e "${CYAN} $TAG_MIXED ${NC}"
+            echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            echo "服务器: $SERVER_IP"
+            echo "端口: $P_MIXED"
+            echo "用户: tiktok"
+            echo "密码: mixed-password"
+            echo ""
+            MIXED_URL="http://tiktok:mixed-password@$SERVER_IP:$P_MIXED#${TAG_MIXED}-$DATE"
+            echo "$MIXED_URL"
+            echo ""
+            echo "$MIXED_URL" | qrencode -t UTF8
+            ;;
+        *)
+            echo -e "${RED}无效选择${NC}"
+            ;;
+    esac
     echo ""
 }
 
